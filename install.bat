@@ -30,7 +30,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-%PY% -m venv .venv
+%PY% -m venv "%~dp0.venv"
 if %errorlevel% neq 0 (
     echo.
     echo Error: could not create the virtual environment (.venv).

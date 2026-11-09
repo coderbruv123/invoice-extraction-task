@@ -2,6 +2,9 @@
 :: Double-click this file to open the Invoice Extractor GUI.
 ::
 :: It reuses the virtual environment (.venv) created by install.bat.
+:: If the packages are missing (install.bat ran under a different shell, or was
+:: interrupted), this launcher (re)installs them into the venv before launching
+:: the app, so it never fails with "No module named pytesseract".
 :: No command line needed — the GUI opens a window with file picker + Extract + Save.
 cd /d "%~dp0"
 
@@ -20,7 +23,34 @@ if exist "%VENV%\Scripts\python.exe" (
     exit /b 1
 )
 
+:: Make sure the venv has the Python packages (pytesseract, Pillow) before
+:: launching. Returns 0 when the app is ready.
+call :ensure_packages "%PYTHON%"
+
 :: Run the GUI (no command line needed). After the window is closed, pause so
 :: the window stays open for the next run.
 "%PYTHON%" invoice_extractor.py
 pause
+exit /b %errorlevel%
+
+:: ---------------------------------------------------------------
+:: ensure_packages <python_executable>
+:: Installs requirements.txt and the editable app into the venv if
+:: pytesseract / Pillow are missing. Returns 0 when the app is ready.
+:: ---------------------------------------------------------------
+:ensure_packages
+setlocal
+set "PY=%~1"
+%PY% -c "import pytesseract, PIL" 2>nul
+if %errorlevel% equ 0 (
+    endlocal
+    exit /b 0
+)
+echo.
+echo Python packages missing in the venv. (Re)installing into %VENV%...
+%PY% -m pip install --upgrade pip
+%PY% -m pip install -r "%~dp0requirements.txt"
+%PY% -m pip install -e "%~dp0.[dev]"
+set "PIP_RC=%errorlevel%"
+endlocal
+exit /b %PIP_RC%
