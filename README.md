@@ -41,37 +41,37 @@ By default the CLI reads the invoice image shipped in the email at
 `/home/dante/Downloads/AI-Powered Invoice Extraction Task.png` and writes
 `outputs/invoice.json` next to the script.
 
-## Install from GitHub
+## Install from GitHub (easiest — one command)
 
-Clone the repo and install it as an editable package (this also installs the CLI
-entry point so you can run the app from anywhere):
+Clone the repo, then run the installer **once**:
 
 ```bash
 git clone <your-repo-url> invoice-extractor
 cd invoice-extractor
-python -m venv .venv
-source .venv/bin/activate          # on Windows: .venv\Scripts\activate
-pip install --upgrade pip
-pip install -e ".[dev]"
+bash install.sh        # Linux / macOS / Git Bash on Windows
 ```
 
-Then run the app in either mode:
+or on Windows double-click `install.bat` in File Explorer.
+
+That command does everything for you:
+1. creates a clean **virtual environment** (`.venv`),
+2. **installs the requirements** (`pytesseract` + `Pillow`),
+3. **installs your app** (`pip install -e ".[dev]"`), which also registers the `invoice-extract` command.
+
+You only run `bash install.sh` (or double-click `install.bat`) one time. After that, run the app anywhere with:
 
 ```bash
-# GUI (recommended)
-invoice-extract
-
-# Command line
-invoice-extract --image path/to/invoice.png --output outputs/invoice.json
+invoice-extract            # GUI (recommended, no command line)
+invoice-extract --image path/to/invoice.png --output outputs/invoice.json   # command line
 ```
 
-With the editable install (`-e`), the command-line entry point `invoice-extract`
-is created, pointing at `app:main`. Development dependencies (test runner) are
-installed via the `[dev]` extra. Run the test suite with:
+Run the tests with:
 
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+Everything is inside the `.venv` folder, so you never need to type `pip install` or `source .venv` again.
 
 ## Project layout
 
