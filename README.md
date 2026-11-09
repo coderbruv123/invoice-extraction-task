@@ -73,12 +73,27 @@ or on Windows double-click `install.bat` in File Explorer.
 
 That installer does everything for you:
 1. creates a clean **virtual environment** (`.venv`),
-2. **installs the requirements** (`pytesseract` + `Pillow`),
-3. **installs your app** (`pip install -e ".[dev]"`), which also registers the `invoice-extract` command.
+2. **installs the Python requirements** (`pytesseract` + `Pillow`),
+3. **installs your app** (`pip install -e .[dev]`), which also registers the `invoice-extract` command,
+4. **installs the tesseract OCR engine** on your system — the binary that `pytesseract` needs (via your OS package manager).
 
 You only run the installer **once**. After that, run the app any time with
 either the double-click files above or the commands below — you never need to
 `pip install` or `source .venv` again.
+
+### Missing the tesseract binary?
+
+If OCR fails with "Tesseract OCR is not installed", install the binary with:
+
+| OS | Command |
+|----|---------|
+| macOS | `brew install tesseract` |
+| Ubuntu / Debian | `sudo apt-get install -y tesseract-ocr` |
+| Fedora | `sudo dnf install -y tesseract` |
+| Windows | `winget install UB-Mannheim.TesseractOCR` |
+
+The installer runs the matching install automatically; this table covers the
+case where it could not detect a package manager.
 
 **Command line after install:**
 

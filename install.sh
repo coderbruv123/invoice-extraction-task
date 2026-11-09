@@ -14,6 +14,31 @@ echo "  Invoice Extractor — Installer"
 echo "============================================"
 echo
 
+# Installing Tesseract OCR: pytesseract needs the tesseract *binary* on the
+# system, not just the Python package.
+install_tesseract() {
+    if command -v tesseract >/dev/null 2>&1; then
+        echo "Tesseract OCR already installed: $(tesseract --version | head -n 1)"
+        return 0
+    fi
+    echo "Tesseract OCR not found. Installing it..."
+    if command -v brew >/dev/null 2>&1; then
+        brew install tesseract
+    elif command -v apt-get >/dev/null 2>&1; then
+        sudo apt-get update
+        sudo apt-get install -y tesseract-ocr
+    elif command -v dnf >/dev/null 2>&1; then
+        sudo dnf install -y tesseract
+    elif command -v yum >/dev/null 2>&1; then
+        sudo yum install -y tesseract
+    else
+        echo "Could not detect a package manager. Please install Tesseract OCR manually:"
+        echo "  macOS:    brew install tesseract"
+        echo "  Ubuntu:   apt-get install -y tesseract-ocr"
+        echo "  Fedora:   dnf install -y tesseract"
+        return 1
+    fi
+}
 # Prefer python3 for creating the venv (python may not exist on some systems)
 PYTHON_BIN="${PYTHON_CMD:-python3}"
 
@@ -38,6 +63,10 @@ echo
 echo "Installing requirements and the invoice extractor (editable, with dev deps)..."
 pip install -r requirements.txt
 pip install -e ".[dev]"
+
+echo
+echo "Installing Tesseract OCR (the binary that pytesseract needs)..."
+install_tesseract
 
 echo
 echo "============================================"

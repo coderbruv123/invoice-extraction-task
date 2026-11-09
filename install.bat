@@ -56,6 +56,22 @@ pip install -r requirements.txt
 pip install -e ".[dev]"
 
 echo.
+echo Installing Tesseract OCR (the binary that pytesseract needs)...
+where tesseract >nul 2>&1
+if %errorlevel% equ 0 (
+    echo Tesseract OCR is already installed.
+) else (
+    where winget >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo Installing Tesseract OCR via winget...
+        winget install --id UB-Mannheim.TesseractOCR
+    ) else (
+        echo Installing Tesseract OCR via Chocolatey...
+        choco install tesseract-ocr -y
+    )
+)
+
+echo.
 echo ============================================================
 echo   Installation complete!
 echo ============================================================

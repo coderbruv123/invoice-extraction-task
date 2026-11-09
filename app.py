@@ -228,6 +228,20 @@ def write_json(data, output_path):
     return path
 
 
+def check_tesseract():
+    """Verify the tesseract binary is installed (pytesseract cannot run without it)."""
+    try:
+        pytesseract.get_tesseract_version()
+    except Exception as exc:
+        print("[-] Tesseract OCR is not installed, so OCR cannot run.", file=sys.stderr)
+        print("    Install the tesseract binary first:", file=sys.stderr)
+        print("      macOS  : brew install tesseract", file=sys.stderr)
+        print("      Ubuntu : sudo apt-get install -y tesseract-ocr", file=sys.stderr)
+        print("      Windows: winget install UB-Mannheim.TesseractOCR", file=sys.stderr)
+        print(f"    Details: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="AI-powered invoice data extraction (Tesseract OCR -> JSON)."
@@ -243,6 +257,8 @@ def main(argv=None):
         help="Path for the output JSON file.",
     )
     args = parser.parse_args(argv)
+
+    check_tesseract()
 
     print(f"[+] Reading invoice image: {args.image}")
     try:
