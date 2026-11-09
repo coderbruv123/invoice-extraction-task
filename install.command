@@ -44,4 +44,7 @@ echo
 echo "Run the extractor with:  invoice-extract"
 echo "Run the tests with:      python -m unittest discover -s tests -v"
 echo
+echo "Open the CLI in a terminal window by double-clicking:"
+echo "  open-cli.command (macOS)"
+echo
 read -r -p "Press Enter to close this window..."

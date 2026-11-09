@@ -22,26 +22,44 @@ brief (RIVERTECH SUPPLIES LTD.). The original brief asks for:
 
 ## Run it
 
+There are two ways to run the app — a graphical user interface (GUI) and a
+command line (CLI). Install it **once**, then run it either by double-clicking a
+file or by typing a command.
+
 ### Option A — GUI (recommended, no command line)
-The GUI opens a window with a file picker, an **Extract** button, and a **Save JSON** button.
+
+After installing, double-click the app for your operating system:
+
+| OS | Double-click this file |
+|----|------------------------|
+| macOS | `open-gui.command` |
+| Linux / git-bash | `open-gui.sh` |
+| Windows | `open-gui.bat` |
+
+The GUI opens a window with a **Select Invoice Image...** button, an **Extract
+Invoice** button and a **Save JSON...** button. It also auto-detects the
+invoice image shipped in the job email (if it's inside your `Downloads`
+folder), so the **Extract** button is already enabled. Pick an image, click
+**Extract**, then **Save JSON...**.
+
+### Option B — Command line (CLI)
+
+After installing, double-click the CLI app for your operating system:
+
+| OS | Double-click this file |
+|----|------------------------|
+| macOS | `open-cli.command` |
+| Linux / git-bash | `open-cli.sh` |
+| Windows | `open-cli.bat` |
+
+This runs `python app.py` in a terminal window. Use arguments to pick the
+input and output files, for example:
 
 ```bash
-python -m pip install -r requirements.txt
-python invoice_extractor.py
+open-cli.command --image path/to/invoice.png --output path/to/invoice.json
 ```
 
-The app auto-detects the invoice image if it's in your `Downloads` folder.
-If you have a different image, click **Select Invoice Image...** first.
-
-### Option B — Command line
-```bash
-python app.py --image path/to/invoice.png --output path/to/invoice.json
-```
-By default the CLI reads the invoice image shipped in the email at
-`/home/dante/Downloads/AI-Powered Invoice Extraction Task.png` and writes
-`outputs/invoice.json` next to the script.
-
-## Install from GitHub (easiest — one command)
+## Install from GitHub (easiest — run once)
 
 Clone the repo, then run the installer **once**:
 
@@ -53,25 +71,27 @@ bash install.sh        # Linux / macOS / Git Bash on Windows
 
 or on Windows double-click `install.bat` in File Explorer.
 
-That command does everything for you:
+That installer does everything for you:
 1. creates a clean **virtual environment** (`.venv`),
 2. **installs the requirements** (`pytesseract` + `Pillow`),
 3. **installs your app** (`pip install -e ".[dev]"`), which also registers the `invoice-extract` command.
 
-You only run `bash install.sh` (or double-click `install.bat`) one time. After that, run the app anywhere with:
+You only run the installer **once**. After that, run the app any time with
+either the double-click files above or the commands below — you never need to
+`pip install` or `source .venv` again.
+
+**Command line after install:**
 
 ```bash
-invoice-extract            # GUI (recommended, no command line)
-invoice-extract --image path/to/invoice.png --output outputs/invoice.json   # command line
+invoice-extract            # CLI, opens the default invoice image
+invoice-extract --image path/to/invoice.png --output outputs/invoice.json
 ```
 
-Run the tests with:
+**Run the tests:**
 
 ```bash
 python -m unittest discover -s tests -v
 ```
-
-Everything is inside the `.venv` folder, so you never need to type `pip install` or `source .venv` again.
 
 ## Project layout
 
