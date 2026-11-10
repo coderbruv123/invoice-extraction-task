@@ -246,14 +246,17 @@ def main(argv=None):
     parser = argparse.ArgumentParser(
         description="AI-powered invoice data extraction (Tesseract OCR -> JSON)."
     )
+    _default_image = Path.home() / "Downloads" / "AI-Powered Invoice Extraction Task.png"
+    _default_output = Path.home() / "Downloads" / "invoice_extracted.json"
+
     parser.add_argument(
         "--image",
-        default="/home/dante/Downloads/AI-Powered Invoice Extraction Task.png",
+        default=str(_default_image),
         help="Path to the invoice image.",
     )
     parser.add_argument(
         "--output",
-        default="/home/dante/Projects/invoice-extraction-task/outputs/invoice.json",
+        default=str(_default_output),
         help="Path for the output JSON file.",
     )
     args = parser.parse_args(argv)

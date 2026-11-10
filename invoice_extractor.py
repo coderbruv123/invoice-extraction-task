@@ -183,10 +183,9 @@ class InvoiceExtractorApp:
         self.root.geometry("920x720")
         self.root.minsize(700, 600)
 
-        # Default image path (from the job email)
-        self.default_image = Path(
-            "/home/dante/Downloads/AI-Powered Invoice Extraction Task.png"
-        )
+        # Default image path (from the job email). Cross-platform: Windows and
+        # macOS both store the user's Downloads folder inside the profile.
+        self.default_image = Path.home() / "Downloads" / "AI-Powered Invoice Extraction Task.png"
         self.current_image = None
 
         self._build_ui()
