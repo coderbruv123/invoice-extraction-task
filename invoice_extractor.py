@@ -20,6 +20,10 @@ from tkinter import filedialog, messagebox, ttk
 import pytesseract
 from PIL import Image
 
+from tesseract_utils import configure_tesseract
+
+configure_tesseract()
+
 # ---------------------------------------------------------------------------
 # Core extraction (same logic as app.py)
 # ---------------------------------------------------------------------------

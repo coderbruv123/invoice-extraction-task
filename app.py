@@ -18,6 +18,10 @@ from pathlib import Path
 import pytesseract
 from PIL import Image
 
+from tesseract_utils import configure_tesseract
+
+configure_tesseract()
+
 # ---------------------------------------------------------------------------
 # OCR
 # ---------------------------------------------------------------------------

@@ -75,7 +75,7 @@ That installer does everything for you:
 1. creates a clean **virtual environment** (`.venv`),
 2. **installs the Python requirements** (`pytesseract` + `Pillow`),
 3. **installs your app** (`pip install -e .[dev]`), which also registers the `invoice-extract` command,
-4. **installs the tesseract OCR engine** on your system — the binary that `pytesseract` needs (via your OS package manager).
+4. **installs and verifies the Tesseract OCR engine** — the separate executable that `pytesseract` needs. On Windows, the app also detects standard Tesseract install locations even when they are not on `PATH`.
 
 You only run the installer **once**. After that, run the app any time with
 either the double-click files above or the commands below — you never need to

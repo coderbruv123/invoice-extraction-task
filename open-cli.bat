@@ -27,21 +27,20 @@ if exist "%VENV%\Scripts\python.exe" (
 :: launching. Returns 0 when the app is ready.
 call :ensure_packages "%PYTHON%"
 
-:: Run the CLI (pass through any arguments), then pause so the window stays open
-:: after the extraction finishes.
+:: Add common installation locations in case Tesseract is not already on PATH.
+set "TESS_BIN_DIR=C:\Program Files\Tesseract-OCR;C:\Program Files (x86)\Tesseract-OCR;C:\ProgramData\chocolatey\bin"
+set "PATH=%PATH%;%TESS_BIN_DIR%"
 where tesseract >nul 2>&1
-if %errorlevel% neq 0 (
+if errorlevel 1 (
     echo.
-    echo Tesseract OCR is not installed or not on PATH in this terminal.
-    echo.
-    echo Run install.bat in a NEW terminal window to install it:
-    echo   install.bat
-    echo Then open this file (open-cli.bat) again.
+    echo Tesseract OCR is not installed or not found in its usual locations.
+    echo Run install.bat to install Tesseract OCR, then open this file again.
     echo.
     pause
     exit /b 1
 )
 
+:: Run the CLI, then pause so the window stays open after extraction finishes.
 "%PYTHON%" app.py
 pause
 exit /b %errorlevel%

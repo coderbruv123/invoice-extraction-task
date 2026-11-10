@@ -59,43 +59,22 @@ echo.
 echo Installing Tesseract OCR (the binary that pytesseract needs)...
 
 :: Tesseract is a system binary; the Python package (pytesseract) only wraps it.
-:: Install it if missing, then confirm it is visible on PATH.
-where tesseract >nul 2>&1
-if errorlevel 1 (
+:: Find it on PATH or in its common installation locations.
+call :find_tesseract
+if not defined TESSERACT_EXE (
+    echo Tesseract was not found. Installing the UB-Mannheim OCR engine...
     call :install_tesseract
-    if %errorlevel% neq 0 (
-        echo.
-        echo Error: could not install Tesseract OCR automatically.
-        echo Try one of these instead:
-        echo   winget install UB-Mannheim.TesseractOCR
-        echo   choco install tesseract-ocr -y
-        echo   https://github.com/UB-Mannheim/tesseract/wiki
-        pause
-        exit /b 1
-    )
-    echo Tesseract install command finished.
-    echo.
-
-    :: Add Tesseract bin directories to the current session's PATH so pytesseract
-    :: can find the tesseract binary without restarting the terminal.
-    set "TESS_BIN_DIR=C:\Program Files\Tesseract-OCR;C:\Program Files (x86)\Tesseract-OCR;C:\ProgramData\chocolatey\bin"
-    set "PATH=%PATH%;%TESS_BIN_DIR%"
-
-    echo Verifying tesseract is now on PATH in this session...
-    where tesseract >nul 2>&1
-    if %errorlevel% equ 0 (
-        echo Tesseract is now visible on PATH. Continuing installation...
-    ) else (
-        echo.
-        echo Tesseract was installed, but it is not yet visible in this terminal.
-        echo Open a NEW terminal window and re-run this installer (or run 'refreshenv'
-        echo if Chocolatey is installed) to add it to the PATH.
-        echo The installer will finish; please start open-gui.bat from a new terminal.
-    )
-    echo.
-) else (
-    echo Tesseract OCR is already installed.
+    if errorlevel 1 goto :tesseract_install_failed
+    call :find_tesseract
 )
+if not defined TESSERACT_EXE goto :tesseract_not_found
+
+:: Add its actual directory to this session and verify the executable itself.
+for %%I in ("%TESSERACT_EXE%") do set "TESS_BIN_DIR=%%~dpI"
+set "PATH=%TESS_BIN_DIR%;%PATH%"
+"%TESSERACT_EXE%" --version >nul 2>&1
+if errorlevel 1 goto :tesseract_not_usable
+echo Tesseract OCR is ready: "%TESSERACT_EXE%"
 
 echo.
 echo ============================================================
@@ -105,57 +84,69 @@ echo.
 echo Run the extractor with:  invoice-extract
 echo Run the tests with:      python -m unittest discover -s tests -v
 echo.
+pause
+exit /b 0
+
+:tesseract_install_failed
+echo.
+echo Error: could not install Tesseract OCR automatically.
+echo Try one of these instead:
+echo   winget install UB-Mannheim.TesseractOCR
+echo   choco install tesseract-ocr -y
+echo   https://github.com/UB-Mannheim/tesseract/wiki
+pause
+exit /b 1
+
+:tesseract_not_found
+echo.
+echo Error: Tesseract installation completed, but tesseract.exe was not found.
+echo Install it from https://github.com/UB-Mannheim/tesseract/wiki
+pause
+exit /b 1
+
+:tesseract_not_usable
+echo.
+echo Error: Tesseract was found at "%TESSERACT_EXE%" but could not run.
+pause
+exit /b 1
+
 :: ---------------------------------------------------------------------------
+:find_tesseract
+set "TESSERACT_EXE="
+for /f "delims=" %%T in ('where tesseract 2^>nul') do if not defined TESSERACT_EXE set "TESSERACT_EXE=%%~fT"
+if not defined TESSERACT_EXE if exist "%ProgramFiles%\Tesseract-OCR\tesseract.exe" set "TESSERACT_EXE=%ProgramFiles%\Tesseract-OCR\tesseract.exe"
+if not defined TESSERACT_EXE if exist "%ProgramFiles(x86)%\Tesseract-OCR\tesseract.exe" set "TESSERACT_EXE=%ProgramFiles(x86)%\Tesseract-OCR\tesseract.exe"
+if not defined TESSERACT_EXE if exist "%ChocolateyInstall%\bin\tesseract.exe" set "TESSERACT_EXE=%ChocolateyInstall%\bin\tesseract.exe"
+if not defined TESSERACT_EXE if exist "%ProgramData%\chocolatey\bin\tesseract.exe" set "TESSERACT_EXE=%ProgramData%\chocolatey\bin\tesseract.exe"
+exit /b 0
+
+::
 :install_tesseract
 :: Install the tesseract binary. Prefers winget, then Chocolatey, then the
 :: UB-Mannheim silent NSIS installer. Returns 0 on success, 1 on failure.
 where winget >nul 2>&1
-if errorlevel 1 (
-    where choco >nul 2>&1
-    if errorlevel 1 (
-        rem No package manager found: download the official silent installer.
-        echo.
-        echo No package manager found (winget or Chocolatey). Downloading the
-        echo UB-Mannheim silent NSIS installer (first time only)...
-        powershell -NoProfile -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://github.com/UB-Mannheim/tesseract/wiki/files/installer/tesseract-ocr-w64-setup-5.4.0.20240606.exe' -OutFile '%TEMP%\tesseract-install.exe'"
-        if %errorlevel% neq 0 (
-            echo.
-            echo Download failed. Install manually from:
-            echo   https://github.com/UB-Mannheim/tesseract/wiki
-            exit /b 1
-        )
-        "%TEMP%\tesseract-install.exe" /S
-        if %errorlevel% neq 0 (
-            echo.
-            echo Silent installer failed (error %errorlevel%). Try running manually:
-            echo   "%TEMP%\tesseract-install.exe" /S
-            exit /b 1
-        )
-        exit /b 0
-    ) else (
-        echo Installing Tesseract OCR via Chocolatey...
-        choco install tesseract-ocr -y
-        if %errorlevel% neq 0 (
-            echo.
-            echo Chocolatey install failed (error %errorlevel%). Try running manually:
-            echo   choco install tesseract-ocr -y
-            exit /b 1
-        )
-        exit /b 0
-    )
-) else (
-    echo Installing Tesseract OCR via winget...
-    winget install --id UB-Mannheim.TesseractOCR
-    if %errorlevel% neq 0 (
-        echo.
-        echo winget install failed (error %errorlevel%). Try running manually:
-        echo   winget install UB-Mannheim.TesseractOCR
-        exit /b 1
-    )
-    exit /b 0
-)
+if not errorlevel 1 goto :install_with_winget
+where choco >nul 2>&1
+if not errorlevel 1 goto :install_with_choco
 
-echo Open the CLI in a terminal window by double-clicking:
-echo   open-cli.bat
+rem No package manager found: download the official silent NSIS installer.
 echo.
-pause
+echo No package manager found (winget or Chocolatey). Downloading the
+echo UB-Mannheim silent NSIS installer (first time only)...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Invoke-WebRequest -Uri 'https://github.com/UB-Mannheim/tesseract/wiki/files/installer/tesseract-ocr-w64-setup-5.4.0.20240606.exe' -OutFile '%TEMP%\tesseract-install.exe'"
+if errorlevel 1 exit /b 1
+"%TEMP%\tesseract-install.exe" /S
+if errorlevel 1 exit /b 1
+exit /b 0
+
+:install_with_choco
+echo Installing Tesseract OCR via Chocolatey...
+choco install tesseract-ocr -y
+if errorlevel 1 exit /b 1
+exit /b 0
+
+:install_with_winget
+echo Installing Tesseract OCR via winget...
+winget install --id UB-Mannheim.TesseractOCR --accept-source-agreements --accept-package-agreements
+if errorlevel 1 exit /b 1
+exit /b 0

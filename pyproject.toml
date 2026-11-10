@@ -28,4 +28,4 @@ dev = ["pytest>=7.0.0"]
 invoice-extract = "app:main"
 
 [tool.setuptools]
-py-modules = ["app", "invoice_extractor"]
+py-modules = ["app", "invoice_extractor", "tesseract_utils"]
