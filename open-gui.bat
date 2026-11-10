@@ -27,6 +27,30 @@ if exist "%VENV%\Scripts\python.exe" (
 :: launching. Returns 0 when the app is ready.
 call :ensure_packages "%PYTHON%"
 
+:: Verify the tesseract binary is available before launching the app.
+:: pytesseract needs the tesseract binary on PATH (or at a known location).
+where tesseract >nul 2>&1
+if %errorlevel% neq 0 (
+    echo.
+    echo Attempting to add tesseract bin directories to PATH...
+    set "TESS_BIN_DIR=C:\Program Files\Tesseract-OCR;C:\Program Files (x86)\Tesseract-OCR;C:\ProgramData\chocolatey\bin"
+    set "PATH=%PATH%;%TESS_BIN_DIR%"
+    where tesseract >nul 2>&1
+    if %errorlevel% neq 0 (
+        echo.
+        echo ERROR: Tesseract OCR is not installed or not found on PATH.
+        echo.
+        echo Please run install.bat in a NEW terminal window:
+        echo   install.bat
+        echo Then open this file (open-gui.bat) again.
+        echo.
+        pause
+        exit /b 1
+    ) else (
+        echo Tesseract bin directories added to PATH.
+    )
+)
+
 :: Run the GUI (no command line needed). After the window is closed, pause so
 :: the window stays open for the next run.
 "%PYTHON%" invoice_extractor.py

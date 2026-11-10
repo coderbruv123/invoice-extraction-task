@@ -73,9 +73,26 @@ if errorlevel 1 (
         pause
         exit /b 1
     )
-    echo Tesseract install command finished. If it was just installed, open a new
-    echo terminal (or run refreshenv) before continuing; then re-run this installer
-    echo to confirm Tesseract is visible on PATH.
+    echo Tesseract install command finished.
+    echo.
+
+    :: Add Tesseract bin directories to the current session's PATH so pytesseract
+    :: can find the tesseract binary without restarting the terminal.
+    set "TESS_BIN_DIR=C:\Program Files\Tesseract-OCR;C:\Program Files (x86)\Tesseract-OCR;C:\ProgramData\chocolatey\bin"
+    set "PATH=%PATH%;%TESS_BIN_DIR%"
+
+    echo Verifying tesseract is now on PATH in this session...
+    where tesseract >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo Tesseract is now visible on PATH. Continuing installation...
+    ) else (
+        echo.
+        echo Tesseract was installed, but it is not yet visible in this terminal.
+        echo Open a NEW terminal window and re-run this installer (or run 'refreshenv'
+        echo if Chocolatey is installed) to add it to the PATH.
+        echo The installer will finish; please start open-gui.bat from a new terminal.
+    )
+    echo.
 ) else (
     echo Tesseract OCR is already installed.
 )

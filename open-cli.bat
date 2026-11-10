@@ -29,6 +29,19 @@ call :ensure_packages "%PYTHON%"
 
 :: Run the CLI (pass through any arguments), then pause so the window stays open
 :: after the extraction finishes.
+where tesseract >nul 2>&1
+if %errorlevel% neq 0 (
+    echo.
+    echo Tesseract OCR is not installed or not on PATH in this terminal.
+    echo.
+    echo Run install.bat in a NEW terminal window to install it:
+    echo   install.bat
+    echo Then open this file (open-cli.bat) again.
+    echo.
+    pause
+    exit /b 1
+)
+
 "%PYTHON%" app.py
 pause
 exit /b %errorlevel%
